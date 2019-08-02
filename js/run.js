@@ -385,7 +385,8 @@ $(function() {
         c.textAlign = "start";
         c.font = font_style;
         c.fillStyle = cur_day_color;
-        c.fillText("Today!", dw(1.0, w) +  dpi * 10, y +  dpi * 5);
+        c.textBaseline = "middle";
+        c.fillText("Today!", dw(1.0, w) +  dpi * 10, y);
     }
 
     function set_birthday(date) {
