@@ -20,6 +20,14 @@ $(function() {
     var best_key = null;
     var best_num = null;
 
+    var header = 50;
+    var spacing = 30;
+    var year_colour = "#DDDDDD";
+    var year_colour2 = "#CCCCCC";
+    var margins = 120;
+    var cur_day_color = "#222222";
+    var font_style = "16px Helvetica-Neue,Helvetica,Arial,sans-serif";
+
 
     var searchParams = new URLSearchParams(window.location.search);
     var url = new URL(window.location.href);
@@ -71,13 +79,6 @@ $(function() {
     });
 
     // Creation
-    var header = 50;
-    var spacing = 30;
-    var year_colour = "#DDDDDD";
-    var margins = 120;
-    var cur_day_color = "#222222";
-    var font_style = "16px Helvetica-Neue,Helvetica,Arial,sans-serif";
-
     draw();
 
     function draw() {
@@ -114,6 +115,10 @@ $(function() {
             c.strokeStyle = year_colour;
             c.lineWidth = 1;
             c.stroke();
+            c.font = font_style;
+            c.textAlign = "end";
+            c.fillStyle = year_colour2;
+            c.fillText(y, dw(0, w) - 10, yh(y) + 5);
         }
     }
 
@@ -153,6 +158,7 @@ $(function() {
         c.lineWidth = 3;
         c.stroke();
         c.font = font_style;
+        c.textAlign = "start";
         c.fillStyle = birth_color;
         c.fillText("You were born", dw(1.01, w), y + 5);
     }
@@ -167,6 +173,7 @@ $(function() {
         c.lineTo(x, y + spacing * 0.4);
         c.lineWidth = 3;
         c.stroke();
+        c.textAlign = "start";
         c.font = font_style;
         c.fillStyle = cur_day_color;
         c.fillText("Here is today!", dw(1.01, w), y + 5);
