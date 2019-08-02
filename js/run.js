@@ -4,6 +4,10 @@ $(function() {
     var planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
     var periods = [87.969, 224.701, 365.256, 686.980, 4332.589, 10759.22, 30685.4, 60189 ];
     var planet_colours = ["#BBBBBB", "#f5ad49", "#4eb6f2", "#f24d44", "#6e2314", "#16a52e", "#42edd4", "#1c28a6"];
+    var planet_color_dict = {};
+    for (var i = 0; i < planet_colours.length; i++) {
+        planet_color_dict[planets[i]] = planet_colours[i];
+    }
     var birth_color = "#4eb6f2";
     // speed things up
     for (var i = 0; i < periods.length; i++) {
@@ -11,8 +15,9 @@ $(function() {
     }
     var birthdays = [];
     var d_birthdays = {};
-    var y_birthdays = [];
-    var all_years = [];
+    var coords_x = [];
+    var coords_y = [];
+    var coords_date = [];
     var all_dates = [];
     var start_year = moment().year();
     var num_years = 100;
@@ -25,8 +30,12 @@ $(function() {
     var year_colour = "#DDDDDD";
     var year_colour2 = "#CCCCCC";
     var margins = 120;
+    var tooltip_offset = 70;
+    var tooltip_width = 100;
     var cur_day_color = "#222222";
     var font_style = "16px Helvetica-Neue,Helvetica,Arial,sans-serif";
+    var canvas = document.getElementById("canvas-output");
+    var canvasjq = $("#canvas-output");
 
 
     var searchParams = new URLSearchParams(window.location.search);
@@ -81,12 +90,19 @@ $(function() {
     // Creation
     draw();
 
-    function draw() {
-        var canvas = document.getElementById("canvas-output");
-        var cc = $("#canvas-output");
+    canvasjq.mousemove(function(evt){
+        var rect = canvas.getBoundingClientRect();
+        pos = {
+            x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+            y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+        };
+        draw(pos);
+    });
+
+    function draw(pos) {
         var c = canvas.getContext("2d");
-        canvas.setAttribute('width', parseInt(cc.css('width')));
-        canvas.setAttribute('height', parseInt(cc.css('height')));
+        canvas.setAttribute('width', parseInt(canvasjq.css('width')));
+        canvas.setAttribute('height', parseInt(canvasjq.css('height')));
         var w = canvas.width;
         var h = canvas.height;
         clear_canvas(c, w, h);
@@ -94,6 +110,55 @@ $(function() {
         draw_birthdays(c, w, h);
         draw_birth(c, w, h);
         draw_today(c, w, h);
+        if (!(pos == undefined)) {
+            draw_tooltip(pos, c, w, h);
+        }
+    }
+
+    function draw_tooltip(pos, c, w, h) {
+        var index = calc_close(pos);
+        if (index != null) {
+            var x = coords_x[index];
+            var y = coords_y[index];
+            var d = coords_date[index];
+            var planets = d_birthdays[d];
+
+            if (planets != undefined) {
+                c.fillStyle = "#FFFFFF";
+                c.strokeStyle = "#DDDDDD";
+                c.lineWidth = 1;
+                var height = (planets.length + 1) * 25;
+                roundRect(c, x + 15, y - height * 0.5, tooltip_width, height, 5, true, true);
+                c.font = "bold " + font_style;
+                c.textAlign = "center";
+                c.textBaseline = "top";
+                c.fillStyle = "#888888";
+                c.font = "bold" + font_style;
+                c.fillText(d, x + tooltip_width * 0.5 + 15, y - height * 0.5 + 5);
+                for (var i = 0; i < planets.length; i++) {
+                    c.fillStyle = planet_color_dict[planets[i]];
+                    c.fillText(planets[i], x + tooltip_width * 0.5 + 15, y - height * 0.5 + 5 + (i + 1) * 20)
+                }
+            }
+        }
+    }
+
+    function calc_close(pos) {
+        var min_dist = 99999999;
+        var dist = 0;
+        var index = 0;
+        for (var i = 0; i < coords_date.length; i++) {
+            dist = Math.pow((coords_x[i] - pos.x), 2) + Math.pow((coords_y[i] - pos.y), 2);
+            if (dist < min_dist) {
+                min_dist = dist;
+                index = i;
+            }
+        }
+        if (min_dist < Math.pow(30, 2)) {
+            return index;
+        } else {
+            return null;
+        }
     }
 
     function yh(y) {
@@ -128,6 +193,9 @@ $(function() {
 
     function draw_birthdays(c, w, h) {
         // For each planet
+        coords_x = [];
+        coords_y = [];
+        coords_date = [];
         for (var i = planets.length - 1; i >= 0; i--) {
             var planet_colour = planet_colours[i];
             var size = get_planet_radius(i);
@@ -141,10 +209,13 @@ $(function() {
                 var num_days = m.isLeapYear() ? 366 : 365;
                 var cur_day = m.dayOfYear();
                 var ratio = cur_day / num_days;
-
+                var width = dw(ratio, w);
                 c.beginPath();
-                c.arc(dw(ratio, w), height, size, 0, 2 * Math.PI);
+                c.arc(width, height, size, 0, 2 * Math.PI);
                 c.fill();
+                coords_x.push(width);
+                coords_y.push(height);
+                coords_date.push(days[j].format("YYYY/MM/DD"));
             }
         }
     }
@@ -177,7 +248,6 @@ $(function() {
         c.font = font_style;
         c.fillStyle = cur_day_color;
         c.fillText("Here is today!", dw(1.01, w), y + 5);
-
     }
 
     function set_birthday(date) {
@@ -226,6 +296,40 @@ $(function() {
         }
         console.log(best_key, best_num, d_birthdays[best_key]);
         draw();
+    }
+    function roundRect(c, x, y, width, height, radius, fill, stroke) {
+        if (typeof stroke == 'undefined') {
+            stroke = true;
+        }
+        if (typeof radius === 'undefined') {
+            radius = 5;
+        }
+        if (typeof radius === 'number') {
+            radius = {tl: radius, tr: radius, br: radius, bl: radius};
+        } else {
+            var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+            for (var side in defaultRadius) {
+                radius[side] = radius[side] || defaultRadius[side];
+            }
+        }
+        c.beginPath();
+        c.moveTo(x + radius.tl, y);
+        c.lineTo(x + width - radius.tr, y);
+        c.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+        c.lineTo(x + width, y + height - radius.br);
+        c.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+        c.lineTo(x + radius.bl, y + height);
+        c.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+        c.lineTo(x, y + radius.tl);
+        c.quadraticCurveTo(x, y, x + radius.tl, y);
+        c.closePath();
+        if (fill) {
+            c.fill();
+        }
+        if (stroke) {
+            c.stroke();
+        }
+
     }
 });
 
