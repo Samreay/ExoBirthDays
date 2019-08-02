@@ -29,9 +29,10 @@ $(function() {
     var spacing = 30;
     var year_colour = "#DDDDDD";
     var year_colour2 = "#CCCCCC";
-    var margins = 120;
+    var margins = 140;
     var tooltip_width = 100;
     var cur_day_color = "#222222";
+    var mega_birthday_color = "#f24d44";
     var font_style = "16px Helvetica-Neue,Helvetica,Arial,sans-serif";
     var canvas = document.getElementById("canvas-output");
     var canvasjq = $("#canvas-output");
@@ -109,8 +110,34 @@ $(function() {
         draw_birthdays(c, w, h);
         draw_birth(c, w, h);
         draw_today(c, w, h);
+        draw_double_birthdays(c, w, h);
         if (!(pos == undefined)) {
             draw_tooltip(pos, c, w, h);
+        }
+    }
+
+    function draw_double_birthdays(c, w, h) {
+        var current_year = moment().year();
+        for (var i = 0; i < all_dates.length; i++) {
+            var d = all_dates[i];
+            if (d in d_birthdays) {
+                var p = d_birthdays[d];
+                var num = p.length;
+                if (num > 1) {
+                    var y = moment(d).year();
+                    if (y != current_year && y != birthday.year()) {
+                        var text = "Double birthday!";
+                        if (num > 2) {
+                            text = "Mega-Birthday!";
+                        }
+                        c.font = font_style;
+                        c.textAlign = "left";
+                        c.textBaseline = "middle";
+                        c.fillStyle = planet_color_dict[p[p.length - 1]];
+                        c.fillText(text, dw(1, w) + 10, yh(y));
+                    }
+                }
+            }
         }
     }
 
@@ -128,7 +155,6 @@ $(function() {
                 c.lineWidth = 1;
                 var height = (planets.length + 1) * 25;
                 roundRect(c, x + 15, y - height * 0.5, tooltip_width, height, 5, true, true);
-                c.font = "bold " + font_style;
                 c.textAlign = "center";
                 c.textBaseline = "top";
                 c.fillStyle = "#888888";
