@@ -20,7 +20,7 @@ $(function() {
     var coords_date = [];
     var all_dates = [];
     var start_year = moment().year();
-    var num_years = 100;
+    var num_years = 130;
     var num_calc = 120;
     var best_key = null;
     var best_num = null;
@@ -30,7 +30,6 @@ $(function() {
     var year_colour = "#DDDDDD";
     var year_colour2 = "#CCCCCC";
     var margins = 120;
-    var tooltip_offset = 70;
     var tooltip_width = 100;
     var cur_day_color = "#222222";
     var font_style = "16px Helvetica-Neue,Helvetica,Arial,sans-serif";
@@ -259,7 +258,7 @@ $(function() {
         d_birthdays = {};
         all_dates = [];
         for (var i = 0; i < planets.length; i++) {
-            var num_iterations = parseInt(200 * 365 / periods[i]);
+            var num_iterations = parseInt(400 * 365 / periods[i]);
             var planet = planets[i];
             var dates = [];
             for (var j = 1; j < num_iterations; j++) {

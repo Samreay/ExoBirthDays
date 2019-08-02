@@ -1,12 +1,18 @@
 .container h1 {
     margin-top: 40px;
     margin-bottom: 20px;
+    text-align: center;
 }
-
+.form-inline {
+    text-align: center;
+}
+.form-inline label {
+    margin-right: 20px;
+}
 #canvas-output {
     width: 100%;
-    height: 3000px;
-    margin-bottom: 30px;
+    height: 3500px;
+    margin-bottom: 100px;
 }
 
 .footer {
