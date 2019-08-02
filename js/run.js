@@ -258,20 +258,25 @@ $(function() {
             var d = coords_date[index];
             var planets = d_birthdays[d];
 
+            var on_right = x < w * 0.8;
+            var m = on_right ? 1 : -1;
+            var n = on_right ? 1 : 0;
+
             if (planets != undefined) {
                 c.fillStyle = "#FFFFFF";
                 c.strokeStyle = "#DDDDDD";
                 c.lineWidth = 1;
                 var height =  dpi * (planets.length + 1) * 25;
-                roundRect(c, x +  dpi * 15, y - height * 0.5, tooltip_width, height,  dpi * 5, true, true);
+                var mid = x + m * dpi * 15 - tooltip_width * !n;
+                roundRect(c, mid, y - height * 0.5, tooltip_width, height,  dpi * 5, true, true);
                 c.textAlign = "center";
                 c.textBaseline = "top";
                 c.fillStyle = "#888888";
                 c.font = "bold" + font_style;
-                c.fillText(d, x + tooltip_width * 0.5 +  dpi * 15, y - height * 0.5 +  dpi * 5);
+                c.fillText(d, x + m * tooltip_width * 0.5 +  dpi * 15 * m, y - height * 0.5 +  dpi * 5);
                 for (var i = 0; i < planets.length; i++) {
                     c.fillStyle = planet_color_dict[planets[i][0]];
-                    c.fillText(planets[i][0] + " " + planets[i][1], x + tooltip_width * 0.5 +  dpi * 15, y - height * 0.5 +  dpi * 5 +  dpi * (i + 1) * 20)
+                    c.fillText(planets[i][0] + " " + planets[i][1], x + m * tooltip_width * 0.5 +  m * dpi * 15, y - height * 0.5 +  dpi * 5 +  dpi * (i + 1) * 20)
                 }
             }
         }
