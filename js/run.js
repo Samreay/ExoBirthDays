@@ -26,19 +26,20 @@ $(function() {
     var best_key = null;
     var best_num = null;
 
-    var header = 50;
-    var spacing = 30;
+    var dpi = window.devicePixelRatio;
+    var header = dpi * 50;
+    var spacing = dpi * 30;
     var year_colour = "#DDDDDD";
     var year_colour2 = "#CCCCCC";
-    var margin_left = 70;
-    var margin_right = 70;
-    var tooltip_width = 100;
+    var margin_left = dpi * 70;
+    var margin_right = dpi * 70;
+    var tooltip_width = dpi * 100;
     var cur_day_color = "#222222";
     var mega_birthday_color = "#f24d44";
-    var font_style = "16px Helvetica-Neue,Helvetica,Arial,sans-serif";
+    var font_size = 16 * dpi;
+    var font_style = font_size + "px Helvetica-Neue,Helvetica,Arial,sans-serif";
     var canvas = document.getElementById("canvas-output");
     var canvasjq = $("#canvas-output");
-    var dpi = window.devicePixelRatio;
 
 
     var searchParams = new URLSearchParams(window.location.search);
@@ -242,7 +243,7 @@ $(function() {
                         c.textAlign = "left";
                         c.textBaseline = "middle";
                         c.fillStyle = planet_color_dict[p[p.length - 1][0]];
-                        c.fillText(text, dw(1, w) + 10, yh(y));
+                        c.fillText(text, dw(1, w) +  dpi * 10, yh(y));
                     }
                 }
             }
@@ -261,16 +262,16 @@ $(function() {
                 c.fillStyle = "#FFFFFF";
                 c.strokeStyle = "#DDDDDD";
                 c.lineWidth = 1;
-                var height = (planets.length + 1) * 25;
-                roundRect(c, x + 15, y - height * 0.5, tooltip_width, height, 5, true, true);
+                var height =  dpi * (planets.length + 1) * 25;
+                roundRect(c, x +  dpi * 15, y - height * 0.5, tooltip_width, height,  dpi * 5, true, true);
                 c.textAlign = "center";
                 c.textBaseline = "top";
                 c.fillStyle = "#888888";
                 c.font = "bold" + font_style;
-                c.fillText(d, x + tooltip_width * 0.5 + 15, y - height * 0.5 + 5);
+                c.fillText(d, x + tooltip_width * 0.5 +  dpi * 15, y - height * 0.5 +  dpi * 5);
                 for (var i = 0; i < planets.length; i++) {
                     c.fillStyle = planet_color_dict[planets[i][0]];
-                    c.fillText(planets[i][0] + " " + planets[i][1], x + tooltip_width * 0.5 + 15, y - height * 0.5 + 5 + (i + 1) * 20)
+                    c.fillText(planets[i][0] + " " + planets[i][1], x + tooltip_width * 0.5 +  dpi * 15, y - height * 0.5 +  dpi * 5 +  dpi * (i + 1) * 20)
                 }
             }
         }
@@ -316,12 +317,13 @@ $(function() {
             c.font = font_style;
             c.textAlign = "end";
             c.fillStyle = year_colour2;
-            c.fillText(y, dw(0, w) - 10, yh(y) + 5);
+            c.textBaseline = "middle";
+            c.fillText(y, dw(0, w) -  dpi * 10, yh(y));
         }
     }
 
     function get_planet_radius(index) {
-        return 3 + 2.5 * index;
+        return  dpi * (3 + 2.5 * index);
     }
 
     function draw_birthdays(c, w, h) {
@@ -365,7 +367,8 @@ $(function() {
             c.font = font_style;
             c.textAlign = "start";
             c.fillStyle = birth_color;
-            c.fillText("Birth!", dw(1.01, w), y + 5);
+            c.textBaseline = "middle";
+            c.fillText("Birth!", dw(1.0, w) +  dpi * 10 , y);
         }
     }
 
@@ -382,7 +385,7 @@ $(function() {
         c.textAlign = "start";
         c.font = font_style;
         c.fillStyle = cur_day_color;
-        c.fillText("Today!", dw(1.01, w), y + 5);
+        c.fillText("Today!", dw(1.0, w) +  dpi * 10, y +  dpi * 5);
     }
 
     function set_birthday(date) {
