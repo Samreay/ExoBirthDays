@@ -3,7 +3,7 @@ $(function() {
     var birthday = null;
     var planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
     var periods = [87.969, 224.701, 365.256, 686.980, 4332.589, 10759.22, 30685.4, 60189 ];
-    var planet_colours = ["#BBBBBB", "#f5ad49", "#4eb6f2", "#f24d44", "#6e2314", "#16a52e", "#42edd4", "#1c28a6"];
+    var planet_colours = ["#AAAAAA", "#f5ad49", "#4eb6f2", "#f24d44", "#6e2314", "#16a52e", "#42edd4", "#1c28a6"];
     var planet_color_dict = {};
     for (var i = 0; i < planet_colours.length; i++) {
         planet_color_dict[planets[i]] = planet_colours[i];
@@ -14,6 +14,7 @@ $(function() {
         periods[i] /= 1;
     }
     var birthdays = [];
+    var ages = [];
     var d_birthdays = {};
     var coords_x = [];
     var coords_y = [];
@@ -63,6 +64,97 @@ $(function() {
         draw();
     };
 
+    function get_calendar() {
+        var cal = ics();
+
+        var num_mercury = parseInt($("#numMercury").val());
+        var num_venus = parseInt($("#numVenus").val());
+        var num_years = parseInt($("#numYears").val());
+        var include_earth = $("#incEarth")[0].checked;
+        var now = moment();
+
+        var end_date = moment().year(moment().year() + num_years);
+        for (var i = 0; i < all_dates.length; i++) {
+
+            var bdate = all_dates[i];
+            var mdate = moment(bdate, "YYYY/MM/DD");
+
+            if (mdate.isAfter(end_date) || mdate.isBefore(now)) {
+                continue;
+            }
+
+            var planet_ages = d_birthdays[bdate];
+
+            var special = planet_ages.length > 1;
+
+            var title = "";
+            if (special) {
+                title += "Mega Birthday! "
+            }
+
+            if (!special && !include_earth && planet_ages[0][0] == "Earth") {
+                continue;
+            }
+            var added = false;
+            for (var j = 0; j < planet_ages.length; j++) {
+                var planet = planet_ages[j][0];
+                var age = planet_ages[j][1];
+                if (!special && planet == "Mercury" && age % num_mercury != 0) {
+                    continue;
+                }
+                if (!special && planet == "Venus" && age % num_venus != 0) {
+                    continue;
+                }
+                if (added) {
+                    title += " and ";
+                }
+                title += place(age) + " " + planet;
+                added = true;
+            }
+            if (title == "") {
+                continue;
+            } else {
+                title += " Birthday!";
+            }
+
+            var fmt_date = mdate.format("MM/DD/YYYY");
+            var desc = "Generated at https://samreay.github.io/SpaceBirthdays/?date=" + birthday.format("YYYY-MM-DD") + " \\n\\nTo find all events search 'Space Birthdays'";
+
+            console.log(fmt_date, title, desc);
+
+            cal.addEvent(title, desc, "", fmt_date, fmt_date);
+
+        }
+        cal.download("SpaceBirthdays");
+    }
+
+    function place(num) {
+        if (num % 10 == 1) {
+            if (num == 11) {
+                return num + "th";
+            } else {
+                return num + "st";
+            }
+        } else if (num % 10 == 2) {
+            if (num == 12) {
+                return num + "th";
+            } else {
+                return num + "nd";
+            }
+        } else if (num % 10 == 3) {
+            if (num == 13) {
+                return num + "th";
+            } else {
+                return num + "rd";
+            }
+        } else {
+            return num + "th";
+        }
+    }
+
+    $("#calbtn").on('click', function (e) {
+        get_calendar()
+    });
     // Monitoring
     function watch_date(input) {
         if (input == undefined) {
@@ -77,10 +169,12 @@ $(function() {
         console.log(str);
         // change the search property of the main url
         window.history.replaceState({}, null, str);
-        set_date(input);
-        $('html, body').animate({
-            scrollTop: yh(moment().year()) - 200
-        }, 500);
+        var newdate = set_date(input);
+        if (newdate) {
+            $('html, body').animate({
+                scrollTop: yh(moment().year()) - 200
+            }, 500);
+        }
     }
 
     function set_date(input) {
@@ -89,7 +183,9 @@ $(function() {
             birthday = new_birthday;
             start_year = moment().year();
             set_birthday(birthday);
+            return true;
         }
+        return false;
     }
     $("#datepicker").on("change", function() {
         watch_date();
@@ -132,7 +228,7 @@ $(function() {
                 var p = d_birthdays[d];
                 var num = p.length;
                 if (num > 1) {
-                    var y = moment(d).year();
+                    var y = moment(d, "YYYY/MM/DD").year();
                     if (y != current_year && y != birthday.year()) {
                         var text = "Double!";
                         if (num == 3) {
@@ -144,7 +240,7 @@ $(function() {
                         c.font = font_style;
                         c.textAlign = "left";
                         c.textBaseline = "middle";
-                        c.fillStyle = planet_color_dict[p[p.length - 1]];
+                        c.fillStyle = planet_color_dict[p[p.length - 1][0]];
                         c.fillText(text, dw(1, w) + 10, yh(y));
                     }
                 }
@@ -172,8 +268,8 @@ $(function() {
                 c.font = "bold" + font_style;
                 c.fillText(d, x + tooltip_width * 0.5 + 15, y - height * 0.5 + 5);
                 for (var i = 0; i < planets.length; i++) {
-                    c.fillStyle = planet_color_dict[planets[i]];
-                    c.fillText(planets[i], x + tooltip_width * 0.5 + 15, y - height * 0.5 + 5 + (i + 1) * 20)
+                    c.fillStyle = planet_color_dict[planets[i][0]];
+                    c.fillText(planets[i][0] + " " + planets[i][1], x + tooltip_width * 0.5 + 15, y - height * 0.5 + 5 + (i + 1) * 20)
                 }
             }
         }
@@ -264,10 +360,12 @@ $(function() {
         c.arc(x, y, get_planet_radius(2), 0, 2 * Math.PI);
         c.lineWidth = 3;
         c.stroke();
-        c.font = font_style;
-        c.textAlign = "start";
-        c.fillStyle = birth_color;
-        c.fillText("Birth!", dw(1.01, w), y + 5);
+        if (moment().year() != birthday.year()) {
+            c.font = font_style;
+            c.textAlign = "start";
+            c.fillStyle = birth_color;
+            c.fillText("Birth!", dw(1.01, w), y + 5);
+        }
     }
 
     function draw_today(c, w, h) {
@@ -298,6 +396,7 @@ $(function() {
             var num_iterations = parseInt(400 * 365 / periods[i]);
             var planet = planets[i];
             var dates = [];
+            var ages = [];
             for (var j = 1; j < num_iterations; j++) {
                 if (planet == "Earth") {
                     var d = date.clone().add(j, 'y');
@@ -305,6 +404,7 @@ $(function() {
                     var d = date.clone().add(j * periods[i], 'd');
                 }
                 dates.push(d);
+                ages.push(j);
                 var key = d.format("YYYY/MM/DD");
                 if (!(key in all_dates)) {
                     all_dates.push(key);
@@ -312,25 +412,22 @@ $(function() {
                 if (!(key in d_birthdays)) {
                     d_birthdays[key] = []
                 }
-                d_birthdays[key].push(planet);
+                d_birthdays[key].push([planet, j]);
             }
             birthdays.push(dates);
+            ages.push(dates);
         }
         all_dates.sort();
         best_key = all_dates[0];
         best_num = d_birthdays[best_key].length;
         for (var i = 1; i < all_dates.length; i++) {
             var num = d_birthdays[all_dates[i]].length;
-            if (num > 1) {
-                console.log(all_dates[i], num, d_birthdays[all_dates[i]]);
-            }
             if (num > best_num) {
                 best_num = num;
                 best_key = all_dates[i];
                 break;
             }
         }
-        console.log(best_key, best_num, d_birthdays[best_key]);
         draw();
     }
     function roundRect(c, x, y, width, height, radius, fill, stroke) {

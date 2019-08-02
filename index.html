@@ -8,7 +8,6 @@
     <!-- Bootstrap CSS -->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
     <link href="css/datepicker.css" rel="stylesheet" type="text/css" />
 
@@ -18,6 +17,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>    <link rel="stylesheet" href="css/bootstrap-year-calendar.min.css">
     <script src="js/bootstrap-datepicker.js" type="text/javascript"></script>
     <script src="js/moment.js"></script>
+    <script src="js/ics.deps.min.js"></script>
     <script src="js/run.js"></script>
 
     <link rel="icon" type="image/png" href="img/planet.png" sizes="32x32">
@@ -53,9 +53,52 @@
             <div class="form-group form-inline">
                 <label for="datepicker" class="lead">Enter your birthdate and find out:</label>
                 <input type='text' id='datepicker' class="form-control" placeholder="YYYY-MM-DD"/>
+                <button class="btn btn-default btn-inline" data-toggle="modal" data-target="#myModal">Get Calendar!</button>
             </div>
             <!--<div class='input-group date ' >-->
             <!--</div>-->
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Configure desired calendar</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>To not swamp you with notifications and events, we suggest the following settings, which decrease
+                        the frequency of Mercurian birthdays and limits events to the next few years.</p>
+                        <form>
+                            <div class="form-group">
+                                <label for="numYears">Number of years to generate:</label>
+                                <input type="number" class="form-control" id="numYears" value="10" min="1" max="100" placeholder="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="numMercury">Mercury every N years:</label>
+                                <input type="number" class="form-control" id="numMercury" value="5" min="1" placeholder="5">
+                                <p class="help-block">For example, 5 gives you your 5th, 10th, 15th Mercury Birthday, etc.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="numVenus">Venus every N years:</label>
+                                <input type="number" class="form-control" id="numVenus" value="2" min="1" placeholder="2">
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="false" id="incEarth">Include Earth
+                                </label>
+                            </div>
+                        </form>
+                        <p>The ICS you download can be important into any calendar app. <a href="https://calendar.google.com/calendar/r/settings/export" target="_blank">This is the link for Google Calendars.</a></p>
+                        <p>We recommend creating a <em>new calendar</em> to import these events into, so you can easily hide or show them.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="calbtn" data-dismiss="modal">Download ICS</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="container">
             <canvas id="canvas-output">
@@ -67,7 +110,7 @@
         <div class="footer navbar-fixed-bottom">
             <div class="container">
                 <p class="text-muted pull-left">Made in a hack session at <a href="http://openastronomy.org/pyastro/2019/" target="_blank">Python in Astronomy 2019.</a></p>
-                <p class="text-muted pull-right">For more shenanigans, <a href="https://samreay.github.io/Refractorium/" target="_blank">see here.</a></p>
+                <p class="text-muted pull-right">For more shenanigans, <a href="https://cosmiccoding.com.au" target="_blank">see here.</a></p>
                 <!--Get the link to the calendar thingo and replace my website-->
             </div>
         </div>
