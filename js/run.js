@@ -220,7 +220,7 @@ $(function() {
     }
 
     function get_planet_radius(index) {
-        return 3 + 2 * index;
+        return 3 + 2.5 * index;
     }
 
     function draw_birthdays(c, w, h) {
