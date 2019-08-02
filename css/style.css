@@ -32,4 +32,11 @@
     #datepicker {
         margin-bottom: 15px;
     }
+    .footer .pull-left {
+        display: none;
+    }
+    .footer .pull-right {
+        float: none !important;
+        text-align: center;
+    }
 }
