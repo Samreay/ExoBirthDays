@@ -38,6 +38,7 @@ $(function() {
     var font_style = "16px Helvetica-Neue,Helvetica,Arial,sans-serif";
     var canvas = document.getElementById("canvas-output");
     var canvasjq = $("#canvas-output");
+    var dpi = window.devicePixelRatio;
 
 
     var searchParams = new URLSearchParams(window.location.search);
@@ -205,8 +206,8 @@ $(function() {
 
     function draw(pos) {
         var c = canvas.getContext("2d");
-        canvas.setAttribute('width', parseInt(canvasjq.css('width')));
-        canvas.setAttribute('height', parseInt(canvasjq.css('height')));
+        canvas.setAttribute('width', dpi * parseInt(canvasjq.css('width')));
+        canvas.setAttribute('height', dpi * parseInt(canvasjq.css('height')));
         var w = canvas.width;
         var h = canvas.height;
         clear_canvas(c, w, h);
