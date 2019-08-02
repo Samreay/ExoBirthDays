@@ -198,7 +198,7 @@ $(function() {
 
     canvasjq.mousemove(function(evt){
         var rect = canvas.getBoundingClientRect();
-        pos = {
+        var pos = {
             x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
             y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
         };
@@ -258,9 +258,9 @@ $(function() {
             var d = coords_date[index];
             var planets = d_birthdays[d];
 
-            var on_right = x < w * 0.6;
-            var m = on_right ? 1 : -1;
-            var n = on_right ? 1 : 0;
+            var on_left = x < w * 0.6;
+            var m = on_left ? 1 : -1;
+            var n = on_left ? 1 : 0;
 
             if (planets != undefined) {
                 c.fillStyle = "#FFFFFF";
