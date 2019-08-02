@@ -54,12 +54,12 @@ $(function() {
         if (!moment(input).isValid()) {
             return;
         }
-        searchParams.set("date", input);
+        searchParams.set("date", moment(input).format("YYYY-MM-DD"));
         url.search = searchParams.toString();
         var str = url.toString();
         console.log(str);
         // change the search property of the main url
-        // window.history.replaceState({}, null, str);
+        window.history.replaceState({}, null, str);
         set_date(input);
     }
     function set_date(input) {
