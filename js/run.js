@@ -29,9 +29,15 @@ $(function() {
     }
     // Setup
     create_layout();
-    $('#datepicker').datepicker({
-        format: 'yyyy-mm-dd'
+    var dp = $('#datepicker').datepicker({
+        format: 'yyyy-mm-dd',
+        showWeekDays: false,
+        autoclose: true
     });
+    dp.on("changeDate", function(e) {
+        watch_date(e.date);
+    });
+
     // Instantiate a slider
     var yearSlider = $("#yearSlider").slider({
         min: 1900,
@@ -41,6 +47,21 @@ $(function() {
     });
 
     // Monitoring
+    function watch_date(input) {
+        if (input == undefined) {
+            input = $("#datepicker")[0].value;
+        }
+        if (!moment(input).isValid()) {
+            return;
+        }
+        searchParams.set("date", input);
+        url.search = searchParams.toString();
+        var str = url.toString();
+        console.log(str);
+        // change the search property of the main url
+        // window.history.replaceState({}, null, str);
+        set_date(input);
+    }
     function set_date(input) {
         var new_birthday = moment(input);
         if (birthday == null || !new_birthday.isSame(birthday)) {
@@ -57,14 +78,7 @@ $(function() {
         }
     }
     $("#datepicker").on("change", function() {
-        var input = $("#datepicker")[0].value;
-        searchParams.set("date", input);
-        url.search = searchParams.toString();
-        var str = url.toString();
-        console.log(str);
-        // change the search property of the main url
-        window.history.replaceState({}, null, str);
-        set_date(input);
+        watch_date();
     });
     $("#yearSlider").on("change", $.debounce(200, function() {
         year = yearSlider.slider('getValue');
@@ -91,6 +105,7 @@ $(function() {
         }
         birthdays = [];
         d_birthdays = {};
+        all_dates = [];
         for (var i = 0; i < planets.length; i++) {
             var num_iterations = parseInt(200 * 365 / periods[i]);
             var planet = planets[i];
