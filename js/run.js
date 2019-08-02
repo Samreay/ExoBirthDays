@@ -29,7 +29,8 @@ $(function() {
     var spacing = 30;
     var year_colour = "#DDDDDD";
     var year_colour2 = "#CCCCCC";
-    var margins = 140;
+    var margin_left = 70;
+    var margin_right = 70;
     var tooltip_width = 100;
     var cur_day_color = "#222222";
     var mega_birthday_color = "#f24d44";
@@ -58,6 +59,9 @@ $(function() {
         watch_date(e.date);
     });
 
+    window.onresize = function() {
+        draw();
+    };
 
     // Monitoring
     function watch_date(input) {
@@ -126,9 +130,12 @@ $(function() {
                 if (num > 1) {
                     var y = moment(d).year();
                     if (y != current_year && y != birthday.year()) {
-                        var text = "Double birthday!";
-                        if (num > 2) {
-                            text = "Mega-Birthday!";
+                        var text = "Double!";
+                        if (num == 3) {
+                            text = "Triple!";
+                        }
+                        if (num == 4) {
+                            text = "MEGA!"
                         }
                         c.font = font_style;
                         c.textAlign = "left";
@@ -190,7 +197,7 @@ $(function() {
         return header + spacing * (y - start_year)
     }
     function dw(ratio, w) {
-        return margins + (w - 2 * margins) * ratio
+        return margin_left + (w - margin_left - margin_right) * ratio
     }
 
     function clear_canvas(c, w, h) {
@@ -256,7 +263,7 @@ $(function() {
         c.font = font_style;
         c.textAlign = "start";
         c.fillStyle = birth_color;
-        c.fillText("You were born", dw(1.01, w), y + 5);
+        c.fillText("Birth!", dw(1.01, w), y + 5);
     }
 
     function draw_today(c, w, h) {
@@ -272,7 +279,7 @@ $(function() {
         c.textAlign = "start";
         c.font = font_style;
         c.fillStyle = cur_day_color;
-        c.fillText("Here is today!", dw(1.01, w), y + 5);
+        c.fillText("Today!", dw(1.01, w), y + 5);
     }
 
     function set_birthday(date) {
