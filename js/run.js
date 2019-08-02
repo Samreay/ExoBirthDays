@@ -258,7 +258,7 @@ $(function() {
             var d = coords_date[index];
             var planets = d_birthdays[d];
 
-            var on_right = x < w * 0.8;
+            var on_right = x < w * 0.6;
             var m = on_right ? 1 : -1;
             var n = on_right ? 1 : 0;
 
@@ -293,7 +293,7 @@ $(function() {
                 index = i;
             }
         }
-        if (min_dist < Math.pow(30, 2)) {
+        if (min_dist < dpi * Math.pow(30, 2)) {
             return index;
         } else {
             return null;
