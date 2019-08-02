@@ -90,3 +90,15 @@
     background-image: -o-linear-gradient(top, #aaaaaa 0%, #888888 100%);
     background-image: linear-gradient(to bottom, #aaaaaa 0%, #888888 100%);
 }
+.footer {
+    height: 40px;
+    background-color: #f5f5f5;
+    width: 100%;
+}
+
+.footer p {
+    margin: 0;
+    padding-top: 10px;
+    line-height: 1.2em;
+    font-size: 1.2em;
+}
