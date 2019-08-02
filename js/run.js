@@ -43,7 +43,7 @@ $(function() {
     var url = new URL(window.location.href);
     if (searchParams.has('date')) {
         var url_date = searchParams.get('date');
-        var d = moment(url_date);
+        var d = moment(url_date, "YYYY-M-D");
         if (d.isValid()) {
             $("#datepicker").val(d.format("YYYY-MM-DD"));
             set_date(d);
