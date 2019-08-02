@@ -78,7 +78,11 @@ $(function() {
         // change the search property of the main url
         window.history.replaceState({}, null, str);
         set_date(input);
+        $('html, body').animate({
+            scrollTop: yh(moment().year()) - 200
+        }, 500);
     }
+
     function set_date(input) {
         var new_birthday = moment(input);
         if (birthday == null || !new_birthday.isSame(birthday)) {
