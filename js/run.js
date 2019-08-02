@@ -3,15 +3,19 @@ $(function() {
     var birthday = null;
     var planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
     var periods = [87.969, 224.701, 365.256, 686.980, 4332.589, 10759.22, 30685.4, 60189 ];
+    var planet_colours = ["#BBBBBB", "#f5ad49", "#4eb6f2", "#f24d44", "#6e2314", "#16a52e", "#42edd4", "#1c28a6"];
+    var birth_color = "#4eb6f2";
     // speed things up
     for (var i = 0; i < periods.length; i++) {
         periods[i] /= 1;
     }
     var birthdays = [];
     var d_birthdays = {};
+    var y_birthdays = [];
+    var all_years = [];
     var all_dates = [];
-    var year = moment().year();
-    var num_years = 20;
+    var start_year = moment().year();
+    var num_years = 100;
     var num_calc = 120;
     var best_key = null;
     var best_num = null;
@@ -28,7 +32,6 @@ $(function() {
         }
     }
     // Setup
-    create_layout();
     var dp = $('#datepicker').datepicker({
         format: 'yyyy-mm-dd',
         showWeekDays: false,
@@ -38,13 +41,6 @@ $(function() {
         watch_date(e.date);
     });
 
-    // Instantiate a slider
-    var yearSlider = $("#yearSlider").slider({
-        min: 1900,
-        max: 2100,
-        value: moment().year(),
-        labelledby: 'sliderlabel'
-    });
 
     // Monitoring
     function watch_date(input) {
@@ -66,37 +62,115 @@ $(function() {
         var new_birthday = moment(input);
         if (birthday == null || !new_birthday.isSame(birthday)) {
             birthday = new_birthday;
-            yearSlider = $("#yearSlider").slider({
-                min: birthday.year(),
-                max: birthday.year() + num_calc,
-                value: moment().year(),
-                labelledby: 'sliderlabel'
-            });
-            $('#yearSlider').slider('refresh', { useCurrentValue: true });
-            year = moment().year();
+            start_year = moment().year();
             set_birthday(birthday);
         }
     }
     $("#datepicker").on("change", function() {
         watch_date();
     });
-    $("#yearSlider").on("change", $.debounce(200, function() {
-        year = yearSlider.slider('getValue');
-        create_layout()
-    }));
-
 
     // Creation
-    function create_layout() {
-        var elem = $("#output");
-        elem.empty();
-        for (var i = 0; i < num_years; i++) {
-            elem.append(get_year_div(year + i));
+    var header = 50;
+    var spacing = 30;
+    var year_colour = "#DDDDDD";
+    var margins = 120;
+    var cur_day_color = "#222222";
+    var font_style = "16px Helvetica-Neue,Helvetica,Arial,sans-serif";
+
+    draw();
+
+    function draw() {
+        var canvas = document.getElementById("canvas-output");
+        var cc = $("#canvas-output");
+        var c = canvas.getContext("2d");
+        canvas.setAttribute('width', parseInt(cc.css('width')));
+        canvas.setAttribute('height', parseInt(cc.css('height')));
+        var w = canvas.width;
+        var h = canvas.height;
+        clear_canvas(c, w, h);
+        draw_year_lines(c, w, h);
+        draw_birthdays(c, w, h);
+        draw_birth(c, w, h);
+        draw_today(c, w, h);
+    }
+
+    function yh(y) {
+        return header + spacing * (y - start_year)
+    }
+    function dw(ratio, w) {
+        return margins + (w - 2 * margins) * ratio
+    }
+
+    function clear_canvas(c, w, h) {
+        c.clearRect(0, 0, w, h);
+    }
+
+    function draw_year_lines(c, w, h) {
+        for (var y = start_year; y < start_year + num_years; y++) {
+            c.beginPath();
+            c.moveTo(dw(0, w), yh(y));
+            c.lineTo(dw(1, w), yh(y));
+            c.strokeStyle = year_colour;
+            c.lineWidth = 1;
+            c.stroke();
         }
-        $('[data-toggle="popover"]').popover({
-            html:true
-        });
-        display_birthdays(birthday);
+    }
+
+    function get_planet_radius(index) {
+        return 3 + 2 * index;
+    }
+
+    function draw_birthdays(c, w, h) {
+        // For each planet
+        for (var i = planets.length - 1; i >= 0; i--) {
+            var planet_colour = planet_colours[i];
+            var size = get_planet_radius(i);
+            c.fillStyle = planet_colour;
+
+            var days = birthdays[i];
+            for (var j = 0; j < days.length; j++) {
+                var m = moment(days[j]);
+                var y = m.year();
+                var height = yh(y);
+                var num_days = m.isLeapYear() ? 366 : 365;
+                var cur_day = m.dayOfYear();
+                var ratio = cur_day / num_days;
+
+                c.beginPath();
+                c.arc(dw(ratio, w), height, size, 0, 2 * Math.PI);
+                c.fill();
+            }
+        }
+    }
+
+    function draw_birth(c, w, h) {
+        var y = yh(birthday.year());
+        var x = dw(birthday.dayOfYear() / (birthday.isLeapYear() ? 366 : 365), w);
+        c.beginPath();
+        c.strokeStyle = birth_color;
+        c.arc(x, y, get_planet_radius(2), 0, 2 * Math.PI);
+        c.lineWidth = 3;
+        c.stroke();
+        c.font = font_style;
+        c.fillStyle = birth_color;
+        c.fillText("You were born", dw(1.01, w), y + 5);
+    }
+
+    function draw_today(c, w, h) {
+        var y = yh(moment().year());
+        var ratio = moment().dayOfYear() / (moment().isLeapYear() ? 366 : 365);
+        var x = dw(ratio, w);
+        c.beginPath();
+        c.strokeStyle = cur_day_color;
+        c.moveTo(x, y - spacing * 0.4);
+        c.lineTo(x, y + spacing * 0.4);
+        c.lineWidth = 3;
+        c.stroke();
+        c.font = font_style;
+        c.fillStyle = cur_day_color;
+        c.fillText("Here is today!", dw(1.01, w), y + 5);
+
     }
 
     function set_birthday(date) {
@@ -104,6 +178,7 @@ $(function() {
             return;
         }
         birthdays = [];
+        start_year = date.year();
         d_birthdays = {};
         all_dates = [];
         for (var i = 0; i < planets.length; i++) {
@@ -138,75 +213,13 @@ $(function() {
             }
             if (num > best_num) {
                 best_num = num;
-                best_key = all_dates[i]
+                best_key = all_dates[i];
                 break;
             }
         }
         console.log(best_key, best_num, d_birthdays[best_key]);
-        display_birthdays();
+        draw();
     }
-
-    function display_birthdays() {
-        set_planet_classes();
-    }
-
-    function set_planet_classes() {
-        var elements = $('.day');
-        for (var i = 0; i < elements.length; i++) {
-            var day = elements[i].getAttribute("day");
-            var planets = d_birthdays[day];
-            elements[i].className = "day " + day;
-            if (planets != undefined) {
-                var c = "";
-                for (var j = 0; j < planets.length; j++) {
-                    c += " " + planets[j];
-                    if (j != 0) {
-                        c += j
-                    }
-                }
-                if (planets.length > 1) {
-                    c += " doubleup"
-                }
-                elements[i].className += c;
-                elements[i].setAttribute("data-content", day + "<br />Birthday on " +  planets.join(", ") + "!");
-            } else {
-                elements[i].setAttribute("data-content", day);
-            }
-        }
-    }
-
-    function get_year_div(year) {
-        var div_year = document.createElement("div");
-        var title = document.createElement("h2");
-        title.innerHTML =year;
-        div_year.appendChild(title);
-        div_year.className = "year";
-        var num_days = moment().year(year).isLeapYear() ? 366 : 365;
-        for (var i = 1; i <= num_days; i++) {
-            var day = moment().year(year).dayOfYear(i);
-            if (day.month() != 0 && day.date() == 1) {
-                var spacer = document.createElement("div");
-                spacer.className = "spacer";
-                div_year.appendChild(spacer);
-            }
-            var cls = day.format("YYYY/MM/DD");
-            var day_elem = document.createElement("div");
-            day_elem.setAttribute("day", cls);
-            day_elem.setAttribute("data-toggle", "popover");
-            day_elem.setAttribute("data-placement", "top");
-            day_elem.setAttribute("data-trigger", "hover");
-            day_elem.setAttribute("data-html", "trues");
-            day_elem.setAttribute("data-content", cls);
-            // var plans = cls in d_birthdays ? d_birthdays[cls] : [];
-            day_elem.className = "day " + cls + " " ;//+ plans.join(" ");
-            // day_elem.innerHTML = cls;
-            div_year.appendChild(day_elem);
-        }
-        return div_year;
-    }
-
-
-
 });
 
 
