@@ -213,12 +213,14 @@ $(function() {
         var h = canvas.height;
         clear_canvas(c, w, h);
         draw_year_lines(c, w, h);
-        draw_birthdays(c, w, h);
-        draw_birth(c, w, h);
-        draw_today(c, w, h);
-        draw_double_birthdays(c, w, h);
-        if (!(pos == undefined)) {
-            draw_tooltip(pos, c, w, h);
+        if (birthday != null) {
+            draw_birthdays(c, w, h);
+            draw_birth(c, w, h);
+            draw_today(c, w, h);
+            draw_double_birthdays(c, w, h);
+            if (!(pos == undefined)) {
+                draw_tooltip(pos, c, w, h);
+            }
         }
     }
 
@@ -342,20 +344,22 @@ $(function() {
             c.fillStyle = planet_colour;
 
             var days = birthdays[i];
-            for (var j = 0; j < days.length; j++) {
-                var m = moment(days[j]);
-                var y = m.year();
-                var height = yh(y);
-                var num_days = m.isLeapYear() ? 366 : 365;
-                var cur_day = m.dayOfYear();
-                var ratio = cur_day / num_days;
-                var width = dw(ratio, w);
-                c.beginPath();
-                c.arc(width, height, size, 0, 2 * Math.PI);
-                c.fill();
-                coords_x.push(width);
-                coords_y.push(height);
-                coords_date.push(days[j].format("YYYY/MM/DD"));
+            if (typeof days !== 'undefined') {
+                for (var j = 0; j < days.length; j++) {
+                    var m = moment(days[j]);
+                    var y = m.year();
+                    var height = yh(y);
+                    var num_days = m.isLeapYear() ? 366 : 365;
+                    var cur_day = m.dayOfYear();
+                    var ratio = cur_day / num_days;
+                    var width = dw(ratio, w);
+                    c.beginPath();
+                    c.arc(width, height, size, 0, 2 * Math.PI);
+                    c.fill();
+                    coords_x.push(width);
+                    coords_y.push(height);
+                    coords_date.push(days[j].format("YYYY/MM/DD"));
+                }
             }
         }
     }
